@@ -1,0 +1,12 @@
+#!/bin/bash
+curDir="$(pwd)"
+
+PRO="--progress"
+FLAGS="-ahv --delete "
+EXCLUDES="--exclude=.svn --exclude=bin/amd64-freebsd --exclude=bin/amd64-kfreebsd --exclude=bin/armel-linux --exclude=bin/i386-freebsd --exclude=bin/i386-kfreebsd --exclude=bin/i386-netbsd --exclude=bin/i386-solaris --exclude=bin/mips-irix --exclude=bin/powerpc-aix  --exclude=bin/powerpc-linux --exclude=bin/sparc-linux --exclude=bin/sparc-solaris --exclude=bin/powerpc-aix --exclude=bin/x86_64-solaris --exclude=bin/aarch64-linux --exclude=bin/amd64-netbsd --exclude=armhf-linux --exclude=x86_64-darwinlegacy --exclude=x86_64-linuxmusl"
+#--append-verify"
+
+cd ~
+rsync $PRO $FLAGS  $EXCLUDES tug.org::tldevsrc/Master/ texlive
+cd "$curDir"
+

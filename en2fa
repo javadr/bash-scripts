@@ -1,0 +1,20 @@
+#!/bin/bash
+
+for f in *
+do
+#	newfile="$(echo $f | tr [:upper:] [:lower:] | sed  -e 's/0/۰/g' -e 's/1/۱/g' -e 's/2/۲/g' -e 's/3/۳/g' -e 's/4/۴/g' -e 's/5/۵/g' -e 's/6/۶/g' -e 's/7/۷/g' -e 's/8/۸/g' -e 's/9/۹/g' -e 's/ي/ی/g' -e 's/ك/ک/g')"
+	newfile="$(echo $f | sed  -e 's/0/۰/g' -e 's/1/۱/g' -e 's/2/۲/g' -e 's/3/۳/g' -e 's/4/۴/g' -e 's/5/۵/g' -e 's/6/۶/g' -e 's/7/۷/g' -e 's/8/۸/g' -e 's/9/۹/g' -e 's/ي/ی/g' -e 's/ك/ک/g')"	
+	if [ "$newfile" != "${newfile%.mp۳}" ] 
+	then
+		newfile="$(echo ${newfile%.mp۳}.mp3)"
+	fi
+	if [ "$newfile" != "${newfile%.mp۴}" ] 
+	then
+		newfile="$(echo ${newfile%.mp۴}.mp4)"
+	fi	
+	if [ "$f" != "$newfile" ] 
+	then
+		mv -v "$f" "$newfile"
+	fi
+#	echo $newfile
+done

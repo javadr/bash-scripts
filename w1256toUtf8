@@ -1,0 +1,15 @@
+#/bin/bash
+
+for filename in *.sub;
+do 
+	iconv -f WINDOWS-1256 -t UTF8 "$filename" > "$filename.utf8";
+done
+
+for filename in *.utf8;
+do 
+	cat "$filename" | sed  -e 's/ي/ی/g' -e 's/ك/ک/g' > "${filename%.utf8}";
+	rm "$filename";
+	
+done
+
+

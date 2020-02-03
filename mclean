@@ -1,0 +1,14 @@
+#!/bin/bash 
+
+clean_latex_temp()
+{
+    rm -rifv *.aux *.log *.dvi *.idx *.ilg *.ind *.toc *.out *.pyg *.synctex *.tdo *.blg *.lot *.lol *.lof *.syn *.suc *.bbl *.syc *.brf *.los *.snm *.nav *.gnuplot
+}
+
+clean_latex_temp
+
+if [ -d chapters ];then 
+    cd chapters
+    clean_latex_temp
+    cd ..
+fi

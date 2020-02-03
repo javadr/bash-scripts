@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo dnf update  --best --allowerasing -y $@

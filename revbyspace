@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -f $@ ]; then
+    while read line
+    do
+        echo $line | awk '{for (i=NF; i>1; i--) printf("%s ", $i); print $1;}';
+    done < $@
+else
+   echo $@ | awk '{for (i=NF; i>1; i--) printf("%s ", $i); print $1;}';
+fi
+

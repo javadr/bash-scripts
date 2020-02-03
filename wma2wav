@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# REQUIREMENTS:
+# mplayer
+# http://ubuntuforums.org/showthread.php?t=476390
+
+for i in *.wma
+do mplayer -vo null -vc dummy -af resample=44100 -ao pcm:waveheader:file="${i%.wma}.wav" "$i" 
+done 
