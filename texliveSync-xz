@@ -2,6 +2,6 @@
 curDir="$(pwd)"
 
 cd ~
-rsync -rltz --delete --progress  --modify-window=5  -vh --exclude="mactex*" rsync://rsync.dante.ctan.org/CTAN/systems/texlive/tlnet/ "texlive-xz"
+rsync -rltzz --delete --progress  --modify-window=5  -vh --exclude="mactex*" rsync://rsync.dante.ctan.org/CTAN/systems/texlive/tlnet/ "texlive-xz"
 cd "$curDir"
 

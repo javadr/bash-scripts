@@ -2,7 +2,7 @@
 
 clean_latex_temp()
 {
-    rm -rifv *.aux *.log *.dvi *.idx *.ilg *.ind *.toc *.out *.pyg *.synctex *.tdo *.blg *.lot *.lol *.lof *.syn *.suc *.bbl *.syc *.brf *.los *.snm *.nav *.gnuplot
+    rm -rifv *.aux *.log *.dvi *.idx *.ilg *.ind *.toc *.out *.pyg *.synctex *.tdo *.blg *.lot *.lol *.lof *.syn *.suc *.bbl *.syc *.brf *.los *.snm *.nav *.gnuplot *.hd
 }
 
 clean_latex_temp
