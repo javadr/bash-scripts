@@ -16,7 +16,7 @@ if args.urlfix_or_newline: #urlfix
     output = urllib.parse.unquote(output)
 #    output = urllib.unquote(output)  # in python version prior to 3.6
 else: #newline remove
-    output = output.replace('\n\n', '!$@#').replace('\n','').replace('!$@#','\n')
+    output = output.replace('\n\n', '!$@#').replace('\n',' ').replace('!$@#','\n').title()
 
 pyperclip.copy(f"{output}")
 print(output)
