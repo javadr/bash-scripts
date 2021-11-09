@@ -12,8 +12,7 @@ dev = str(
         """find /sys/devices -type f -name "temp*_input"|sed 's/^/hwmon /g'""",
         shell=True,
         universal_newlines=True))
-devconf = str("""\ntp_fan /proc/acpi/ibm/fan
-
+devconf = str("""\ntp_fan /proc/acpi/ibm/fan\n
 (1,	60,	65)
 (2,	65,	70)
 (3,	70,	75)
@@ -24,5 +23,6 @@ devconf = str("""\ntp_fan /proc/acpi/ibm/fan
 thinkfan = open("/etc/thinkfan.conf", "w")
 thinkfan.writelines(dev + devconf)
 if verbose == True:
-    print("configured thinkfan for " + str(dev.count("\n")) + ' devices')
+    nl = '\n'
+    print(f"configured thinkfan for {str(dev.count(nl))} devices")
 exit()
