@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ps -o pid= -C anydesk|while read f; do
+    kill -9 "$f"
+done
