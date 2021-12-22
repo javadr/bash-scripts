@@ -1,3 +1,6 @@
 #!/bin/sh
 # output name and time of MP4 files 
-exiftool *.mp4 | grep -E "File Name|^Duration"|cut -d: -f2-|awk 'NR%2{printf "فایل%s",$0;next} {print " [",$0,"] ==>"}'|sed 's/.mp4//g ; s/\[  /\[/g; s/ \]/\]/g'
+
+exiftool *.mp4 | grep -E "File Name|^Duration" | cut -d: -f2- | \
+    awk 'NR%2{printf "فایل%s",$0;next} {print " [\033[0;32m",$0,"\033[0m] ==>"}' | \
+    sed 's/.mp4//g ; s/\[  /\[/g; s/ \]/\]/g'
