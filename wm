@@ -1,0 +1,6 @@
+#!/bin/bash
+
+grep -E "^$1[a-z]{$2}$3$" ~/.local/bin/myscripts/words.txt | nl | column
+printf "\033[0;31m" # RED
+grep -E "^$1[a-z]{$2}$3$" ~/.local/bin/myscripts/words_alpha.txt | nl | column
+printf "\033[0m" # No Color
