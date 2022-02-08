@@ -3,7 +3,12 @@
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+cur=$(pwd)
+cd "$1" || exit
+
 gettime
 exiftool *.mp4 | grep -E "^Duration" | cut -d: -f2- | tr : \ | \
     dc -f - -e '60o0ddd[+r60*+r60d**+z1<a]dsaxp' | awk '{$1=$1};1' | \
-    tr " " ":" | xargs -I {} printf "\tTotal time is ${RED}{}${NC}\n"
+    tr " " ":" | xargs -I {} printf "\tTotal is ${RED}{}${NC}\n"
+
+cd "$cur" || exit
