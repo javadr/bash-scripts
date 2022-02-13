@@ -3,12 +3,13 @@
 
 if [[ $# -eq 0 ]];
 then
-    list=$(ls ./*.ppt ./*.pptx 2>/dev/null)
+    mapfile -t list < <(ls ./*.ppt ./*.pptx 2>/dev/null)
+    # list=( $(ls ./*.ppt ./*.pptx 2>/dev/null) )
 else
-    list=$*
+    list=( "$@" )
 fi
 
-for ppt in $list
+for ppt in "${list[@]}"
 do 
     libreoffice --headless --invisible --convert-to pdf "$ppt" 1>/dev/null;
     echo "${ppt#./}" converted to its pdf counterpart.
