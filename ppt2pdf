@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+# Converts ppt[x] files to pdf counterparts.
+
+if [[ $# -eq 0 ]];
+then
+    list=$(ls ./*.ppt ./*.pptx 2>/dev/null)
+else
+    list=$*
+fi
+
+for ppt in $list
+do 
+    libreoffice --headless --invisible --convert-to pdf "$ppt" 1>/dev/null;
+    echo "${ppt#./}" converted to its pdf counterpart.
+done
+
+
