@@ -1,7 +1,0 @@
-#!/bin/bash
-
-curDir=$(pwd)
-cd ~
-sudo -E env "PATH=$PATH" tlmgr --repository texlive-xz update --self --all
-cd $curDir
-
