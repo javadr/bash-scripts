@@ -9,6 +9,7 @@ docker run --rm --name telegram \
     -v "$XDG_RUNTIME_DIR"/pulse:"$XDG_RUNTIME_DIR"/pulse \
     -v /etc/localtime:/etc/localtime:ro \
     -v /home/javad/Downloads/.TelegramDesktop:/home/user/.local/share/TelegramDesktop/ \
-    -v /home/javad/Downloads/Telegram\ Desktop:/home/user/Downloads/Telegram\ Desktop/ \
     --network=host \
-    ghcr.io/xorilog/docker-telegram/telegram &
+    ghcr.io/xorilog/docker-telegram/telegram 2>/dev/null &; disown
+
+# -v /home/javad/Downloads/Telegram\ Desktop:/home/user/Downloads/Telegram\ Desktop/ \
