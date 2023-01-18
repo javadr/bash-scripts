@@ -1,9 +1,17 @@
 #!/bin/bash
-# input: CSV file with students' id and their marks with ',' delimiter.
+# input: CSV file with students' id and their marks with [, \t] delimiters.
 # output: md5sumed students' id and their marks.
 
-cat "$1" | sort -t, -nrk2 | awk -F "," '{
+comma=$(grep -c "," "$1")
+
+if [ "$comma" -ne 0 ];then 
+    grades=$(sort -t, -nrk2 "$1")
+else
+    grades=$(sed -E "s/[\t ]+/,/" "$1" | sort -t, -nrk2)
+fi
+printf "%s" , "$grades" | awk -F "," '{
     cmd="echo -n "$1"|md5sum "
     cmd|getline cksum
     printf "%s %5.2f \n", cksum, $2
     }'
+
