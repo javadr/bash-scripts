@@ -5,6 +5,6 @@
 awk -F "[, \t]+" '{
     cmd="echo -n "$1"|md5sum "
     cmd|getline cksum
-    printf "%s", cksum; for(i=2;i<=NF;i++) printf "%5.4G ",$i; print ""
+    printf "%s", cksum; for(i=2;i<=NF;i++) printf "%-5.4G ",$i; print ""
     }' "$1" | sort -t- -nrk2
 
