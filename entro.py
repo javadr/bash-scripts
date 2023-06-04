@@ -10,6 +10,8 @@ if len(sys.argv) < 2:
 if len(sys.argv) == 2:
     sys.argv.append(f"{1-eval(sys.argv[1])}")
 
+print(f"Probabilities include {', '.join(sys.argv[1:])}")
+
 entropy = 0.0
 isum = 0
 for item in sys.argv[1:]:
