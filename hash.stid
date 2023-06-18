@@ -8,3 +8,4 @@ awk -F "[, \t]+" '{
     printf "%s", cksum; for(i=2;i<=NF;i++) printf "%-5.4G ",$i; print ""
     }' "$1" | sort -t- -nrk2
 
+cat "$1" | tr -s [:blank:] ',' | R --slave -e 'x <- read.csv(file="stdin", header=FALSE, sep = ",", stringsAsFactors = FALSE); summary(x[,2]);'
