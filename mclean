@@ -7,7 +7,13 @@ clean_latex_temp()
              *.bbl *.blg *.bcf *.run.xml *.listing *~
 }
 
+clean_python_temp()
+{
+    rm -rifv __pycache__
+}
+
 clean_latex_temp
+clean_python_temp
 
 if [ -d chapters ];then 
     cd chapters
