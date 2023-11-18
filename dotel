@@ -1,4 +1,5 @@
 #!/bin/bash 
+xhost +"local:docker@"
 
 docker run --rm --name telegram \
     --hostname="$(hostname)" \
