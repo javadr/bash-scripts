@@ -8,7 +8,8 @@ files=()
 
 # Usage function
 usage() {
-    echo "Usage: $0 [-c|--chop <value>] <file1> <file2> ... <fileN>"
+    script_name=$(basename "$0")
+    echo "Usage: $script_name [-c|--chop <value>] <file1> <file2> ... <fileN>"
     echo "Chop the images from the location specified in x axis"
     echo
     echo "Options:"
