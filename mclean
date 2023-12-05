@@ -8,14 +8,14 @@ paths=(".")
 
 clean_latex_temp()
 {
-    rm -rifv -- *.{aux,log,dvi,idx,ilg,ind,toc,out,pyg,synctex,tdo,blg,lot,lol,lof}
-    rm -rifv -- *.{syn,suc,bbl,syc,brf,los,snm,nav,gnuplot,hd,bbl,blg,bcf,run.xml,listing}
-    rm -rifv -- *~
+    rm -fv -- *.{aux,log,dvi,idx,ilg,ind,toc,out,pyg,synctex,tdo,blg,lot,lol,lof}
+    rm -fv -- *.{syn,suc,bbl,syc,brf,los,snm,nav,gnuplot,hd,bbl,blg,bcf,run.xml,listing}
+    rm -fv -- *~
 }
 
 clean_python_temp()
 {
-    rm -rifv __pycache__
+    rm -rfv __pycache__
 }
 
 # Parse command-line options
