@@ -1,10 +1,16 @@
-#!/bin/bash 
+#!/bin/bash
+
+IFS=$'\n'
+
+# Default values
+current_directory="$(pwd)"
+paths=(".")
 
 clean_latex_temp()
 {
-    rm -rifv *.aux *.log *.dvi *.idx *.ilg *.ind *.toc *.out *.pyg *.synctex *.tdo *.blg \
-             *.lot *.lol *.lof *.syn *.suc *.bbl *.syc *.brf *.los *.snm *.nav *.gnuplot *.hd\
-             *.bbl *.blg *.bcf *.run.xml *.listing *~
+    rm -rifv -- *.{aux,log,dvi,idx,ilg,ind,toc,out,pyg,synctex,tdo,blg,lot,lol,lof}
+    rm -rifv -- *.{syn,suc,bbl,syc,brf,los,snm,nav,gnuplot,hd,bbl,blg,bcf,run.xml,listing}
+    rm -rifv -- *~
 }
 
 clean_python_temp()
@@ -12,11 +18,21 @@ clean_python_temp()
     rm -rifv __pycache__
 }
 
-clean_latex_temp
-clean_python_temp
+# Parse command-line options
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        *)
+            paths+=("$1")
+            shift
+            ;;
+    esac
+done
 
-if [ -d chapters ];then 
-    cd chapters
+for ((i=0; i<${#paths[@]}; i++)); do
+    echo "Entering Directory ${paths[i]} ..."
+    cd "${paths[i]}" || exit
     clean_latex_temp
-    cd ..
-fi
+    clean_python_temp
+done
+
+cd "$current_directory" || exit
