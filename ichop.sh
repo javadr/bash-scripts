@@ -47,8 +47,8 @@ done
 # Rest of the script...
 r_value=$((100-c_value))
 
-for i in `ls ${files[@]}`; do 
+for i in `ls ${files[@]}`; do
     echo  "Chopping file $i ..."
     convert "$i" -gravity West -chop $c_value%x0 "${i/.png/-right.png}"
-    convert "$i" -gravity East -chop $r_value%x0 "${i/.png/-left.png}"    
-done 
+    convert "$i" -gravity East -chop $r_value%x0 "${i/.png/-left.png}"
+done
