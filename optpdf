@@ -7,6 +7,7 @@
 #!/bin/bash
 
 IFS=$'\n'
+RNDSFX=""
 
 # Default values
 pdf_files=()
@@ -18,6 +19,7 @@ usage() {
     echo "Optimize the given pdf"
     echo
     echo "Options:"
+    echo "  -t, --temp     add a random suffix to the filename"
     echo "  <pdf1> <pdf2> ... <pdfN>  Specify one or more pdfs"
     exit 1
 }
@@ -25,6 +27,10 @@ usage() {
 # Parse command-line options
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        -t|--temp)
+            RNDSFX="_opt$$"
+            shift
+            ;;
         *.pdf)  # Check if the argument ends with '.pdf'
             pdf_files+=("$1")  # If it does, add it to the PDF files array
             shift
@@ -51,7 +57,7 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
     file="${pdf_files[i]}"
     echo -e "$((i+1))) Optimizing \e[35m$file\e[0m ..."
     filebase="$(basename "$file" .pdf)"
-    optfile="/tmp/${filebase}_opt$$.pdf"
+    optfile="/tmp/${filebase}${RNDSFX}.pdf"
     gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
             -sOutputFile="${optfile}" "${file}"
     if [ $? == '0' ]; then
