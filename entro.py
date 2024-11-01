@@ -8,7 +8,15 @@ if len(sys.argv) < 2:
     sys.exit(-1)
 
 if len(sys.argv) == 2:
-    sys.argv.append(f"{1-eval(sys.argv[1])}")
+    # sys.argv.append(f"{1-eval(sys.argv[1])}")
+    if sys.argv[1].find("/")>0:
+        num, den = map(float, sys.argv[1].split("/"))
+        sys.argv.append(f"{den-num:g}/{den:g}")
+    else:
+        sys.argv[1] = f"{eval(sys.argv[1]):g}"    
+        sys.argv.append(f"{1-eval(sys.argv[1])}")
+        
+
 
 print(f"Probabilities include {', '.join(sys.argv[1:])}")
 
@@ -19,4 +27,5 @@ for item in sys.argv[1:]:
     if ni != 0: entropy += -ni * log(ni, 2)
     isum += ni
 entropy = entropy / isum + log(isum, 2)
+
 print("entropy is: {}".format(entropy))
