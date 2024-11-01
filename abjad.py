@@ -1,5 +1,6 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# ruff: noqa: T201
+
 # ***** BEGIN GPL LICENSE BLOCK *****
 #
 # Copyright (C) 2009: S.M.J.R.,
@@ -18,7 +19,7 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# ***** END GPL LICENCE BLOCK *****
+# ***** END GPL LICENSE BLOCK *****
 # Change Logs:
 # Sun 09 Apr 2017 10:15:55 AM +0430
 # ver 0.12: Support for ة as ت
@@ -30,58 +31,56 @@
 # ver 0.01: Initial version
 
 __author__ = "S.M.J.R."
-__version__ = 0.12
-__date__ = "9Apr2017"
-__email__ = 'javadr@gmail.com'
+__version__ = 0.13
+__date__ = "1Nov2024"
 
 import sys
-import string
 
 
-def abjadCalculate(inputStr):
+def abjad_compute(inputStr):
     s = 0
     abjDic = {
-        u"ا": 1,
-        u"إ": 1,
-        u"أ": 1,
-        u"آ": 2,
-        u"ء": 1,
-        u"ؤ": 1,
-        u"ئ": 1,
-        u"ب": 2,
-        u'پ': 2,
-        u'چ': 3,  #for persian support
-        u"ج": 3,
-        u"د": 4,
-        u"ه": 5,
-        u"و": 6,
-        u"ز": 7,
-        u'ژ': 7,  #for persian support
-        u"ح": 8,
-        u"ط": 9,
-        u"ي": 10,
-        u"ی": 10,
-        u"ك": 20,
-        u"ک": 20,
-        u'گ': 20,  #for persian support
-        u"ل": 30,
-        u"م": 40,
-        u"ن": 50,
-        u"س": 60,
-        u"ع": 70,
-        u"ف": 80,
-        u"ص": 90,
-        u"ق": 100,
-        u"ر": 200,
-        u"ش": 300,
-        u"ت": 400,
-        u"ة": 400,
-        u"ث": 500,
-        u"خ": 600,
-        u"ذ": 700,
-        u"ض": 800,
-        u"ظ": 900,
-        u"غ": 1000
+        "ا": 1,
+        "إ": 1,
+        "أ": 1,
+        "آ": 2,
+        "ء": 1,
+        "ؤ": 1,
+        "ئ": 1,
+        "ب": 2,
+        "پ": 2,
+        "چ": 3,  # for persian support
+        "ج": 3,
+        "د": 4,
+        "ه": 5,
+        "و": 6,
+        "ز": 7,
+        "ژ": 7,  # for persian support
+        "ح": 8,
+        "ط": 9,
+        "ي": 10,
+        "ی": 10,
+        "ك": 20,
+        "ک": 20,
+        "گ": 20,  # for persian support
+        "ل": 30,
+        "م": 40,
+        "ن": 50,
+        "س": 60,
+        "ع": 70,
+        "ف": 80,
+        "ص": 90,
+        "ق": 100,
+        "ر": 200,
+        "ش": 300,
+        "ت": 400,
+        "ة": 400,
+        "ث": 500,
+        "خ": 600,
+        "ذ": 700,
+        "ض": 800,
+        "ظ": 900,
+        "غ": 1000,
     }
     for letter in inputStr:
         s += abjDic.get(letter, 0)
@@ -89,25 +88,26 @@ def abjadCalculate(inputStr):
 
 
 def usage():
-    print("""Abjad Calculus ver {0}[{1}]
+    print(
+        f"""Abjad Calculator ver {__version__}[{__date__}]
     Usage:
-    \tabjad.py <IN1> <IN2> ....""".format(__version__, __date__))
+    \tabjad.py <IN1> <IN2> ....""",
+    )
 
 
-if __name__ == '__main__':
-    allwords = sys.argv[1:] if len(
-        sys.argv) > 1 else sys.stdin.readline().split()
-    if not allwords:  #len(sys.argv) < 2 and len(linesinput)==0:
+if __name__ == "__main__":
+    all_words = sys.argv[1:] if len(sys.argv) > 1 else sys.stdin.readline().split()
+    if not all_words:  # len(sys.argv) < 2 and len(linesinput)==0:
         usage()
         sys.exit()
 
-    abjsum = 0
-    maxStrLen = max([len(i) for i in allwords])
+    abjad_sum = 0
+    maxStrLen = max([len(i) for i in all_words])
 
-    print("Abjad Calculus ver. {}:\n".format(__version__))
-    for i, item in enumerate(allwords):
-        val = abjadCalculate(item)
-        abjsum += val
-        print("{0} \t {1}".format(item.replace('\n', ''), val))
+    print(f"Abjad Calculator ver. {__version__}:\n")
+    for i, item in enumerate(all_words):
+        val = abjad_compute(item)
+        abjad_sum += val
+        print(f"{item.replace('\n', '')} \t {val}")
 
-    print("\nsum: {}".format(abjsum))
+    print(f"\nsum: {abjad_sum}")
