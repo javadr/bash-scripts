@@ -64,18 +64,18 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
         optsize=$(stat -c "%s" "${optfile}")
         orgsize=$(stat -c "%s" "${file}")
         if [ "${optsize}" -eq 0 ]; then
-            echo -e "╚══ No output!  Keeping original"
+            echo -e "╚══ No output!  Keeping original."
             rm -f "${optfile}"
             continue
         fi
         if [ ${optsize} -ge ${orgsize} ]; then
-            echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original\e[0m"
+            echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original.\.e[0m"
             rm -f "${optfile}"
             continue
         fi
         bytesSaved=$(expr $orgsize - $optsize)
         percent=$(expr $optsize '*' 100 / $orgsize)
-        echo -e "╚══ Saving \e[32m$bytesSaved\e[0m bytes (now \e[31m${percent}%\e[0m of old)"
+        echo -e "╚══ Saving \e[32m$bytesSaved\e[0m bytes (\e[31m${percent}%\e[0m of the original one!)"
         # rm "${file}"
         # mv "${optfile}" "${file}"
     fi
