@@ -69,7 +69,7 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
             continue
         fi
         if [ ${optsize} -ge ${orgsize} ]; then
-            echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original.\.e[0m"
+            echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original.\e[0m"
             rm -f "${optfile}"
             continue
         fi
