@@ -4,8 +4,6 @@
 #   This script will attempt to optimize the given pdf
 # https://tex.stackexchange.com/questions/18987
 
-#!/bin/bash
-
 IFS=$'\n'
 RNDSFX=""
 
@@ -46,10 +44,14 @@ if [[ ${#pdf_files[@]} -eq 0 ]]; then
     usage
 fi
 
+current_dir_name=$(basename "$PWD")
+
 echo "Selected File(s) ..."
 for ((i=0; i<${#pdf_files[@]}; i++)); do
     printf  "  %2d) %s\n" $((i+1)) ${pdf_files[i]}
 done
+
+mkdir -p "/tmp/${current_dir_name}"
 
 # Rest of the script...
 # for i in `ls ${pdf_files[@]}`; do
@@ -57,7 +59,7 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
     file="${pdf_files[i]}"
     echo -e "$((i+1))) Optimizing \e[35m$file\e[0m ..."
     filebase="$(basename "$file" .pdf)"
-    optfile="/tmp/${filebase}${RNDSFX}.pdf"
+    optfile="/tmp/${current_dir_name}/${filebase}${RNDSFX}.pdf"
     gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
             -sOutputFile="${optfile}" "${file}"
     if [ $? == '0' ]; then
@@ -80,3 +82,5 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
         # mv "${optfile}" "${file}"
     fi
 done
+
+rmdir "/tmp/${current_dir_name}" &> /dev/null
