@@ -59,7 +59,10 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
     file="${pdf_files[i]}"
     echo -e "$((i+1))) Optimizing \e[35m$file\e[0m ..."
     filebase="$(basename "$file" .pdf)"
-    optfile="/tmp/${current_dir_name}/${filebase}${RNDSFX}.pdf"
+    # Get the full directory path without the file name
+    dirpath=$(dirname "$file")
+    mkdir -p "/tmp/${current_dir_name}/${dirpath}"
+    optfile="/tmp/${current_dir_name}/${dirpath}/${filebase}${RNDSFX}.pdf"
     gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
             -sOutputFile="${optfile}" "${file}"
     if [ $? == '0' ]; then
