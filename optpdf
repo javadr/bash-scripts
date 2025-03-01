@@ -22,6 +22,9 @@ usage() {
     exit 1
 }
 
+# Enable case-insensitive matching for 'case'
+shopt -s nocasematch
+
 # Parse command-line options
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -38,6 +41,9 @@ while [[ "$#" -gt 0 ]]; do
             ;;
     esac
 done
+
+# Disable case-insensitive matching after use
+shopt -u nocasematch
 
 # Check if mandatory argument is provided
 if [[ ${#pdf_files[@]} -eq 0 ]]; then
