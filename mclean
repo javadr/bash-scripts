@@ -8,7 +8,7 @@ paths=(".")
 
 clean_latex_temp()
 {
-    rm -fv -- *.{aux,log,dvi,idx,ilg,ind,toc,out,pyg,synctex,tdo,blg,lot,lol,lof}
+    rm -fv -- *.{aux,log,dvi,idx,ilg,ind,toc,out,pyg,synctex,tdo,blg,lot,lol,lof,synctex.gz}
     rm -fv -- *.{syn,suc,bbl,syc,brf,los,snm,nav,gnuplot,hd,bbl,blg,bcf,run.xml,listing}
     rm -fv -- *~
 }
