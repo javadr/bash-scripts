@@ -13,30 +13,50 @@ pdf_files=()
 # Usage function
 usage() {
     script_name=$(basename "$0")
-    echo "Usage: $script_name <pdf1> <pdf2> ... <pdfN>"
-    echo "Optimize the given pdf"
+    echo "Usage: $script_name [-t] [-r] <pdf1> <pdf2> ... <folder1> <folder2> ..."
+    echo "Optimize the given PDFs"
     echo
     echo "Options:"
-    echo "  -t, --temp     add a random suffix to the filename"
-    echo "  <pdf1> <pdf2> ... <pdfN>  Specify one or more pdfs"
+    echo "  -t, --temp     Add a random suffix to the filename"
+    echo "  -r, --recursive  Search for PDFs recursively in specified folders"
+    echo "  <pdf1> <pdf2> ...  Specify one or more PDFs"
+    echo "  <folder1> <folder2> ...  Specify folders to search for PDFs (with -r)"
     exit 1
 }
 
 # Enable case-insensitive matching for 'case'
 shopt -s nocasematch
 
+# Initialize variables
+RNDSFX=""
+recursive=false
+pdf_files=()
+
 # Parse command-line options
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -t|--temp)
+        -t|--temp)  # Add random suffix
             RNDSFX="_opt$$"
             shift
             ;;
-        *.pdf)  # Check if the argument ends with '.pdf'
-            pdf_files+=("$1")  # If it does, add it to the PDF files array
+        -r|--recursive)  # Enable recursive search
+            recursive=true
             shift
             ;;
-        *)  # Ignore other file types
+        *.pdf)  # If argument is a PDF file, add to array
+            pdf_files+=("$1")
+            shift
+            ;;
+        -*)  # Unknown option
+            echo "Unknown option: $1"
+            usage
+            ;;
+        *)  # Assume it's a directory if recursive is enabled
+            if [ "$recursive" = true ] && [ -d "$1" ]; then
+                pdf_files+=($(find "$1" -type f -iname "*.pdf"))
+            else
+                echo "Skipping unrecognized input: $1"
+            fi
             shift
             ;;
     esac
@@ -54,7 +74,7 @@ current_dir_name=$(basename "$PWD")
 
 echo "Selected File(s) ..."
 for ((i=0; i<${#pdf_files[@]}; i++)); do
-    printf  "  %2d) %s\n" $((i+1)) ${pdf_files[i]}
+    printf  "  %2d) %s\n" $((i+1)) "${pdf_files[i]}"
 done
 
 mkdir -p "/tmp/${current_dir_name}"
@@ -68,20 +88,24 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
     # Get the full directory path without the file name
     dirpath=$(dirname "$file")
     mkdir -p "/tmp/${current_dir_name}/${dirpath}"
-    optfile="/tmp/${current_dir_name}/${dirpath}/${filebase}${RNDSFX}.pdf"
+    optfile=$(realpath "/tmp/${current_dir_name}/${dirpath}/${filebase}${RNDSFX}.pdf")
+    gsoptfile=$(echo "$optfile" | sed 's/%/%%/g')
     gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
-            -sOutputFile="${optfile}" "${file}"
+            -sOutputFile="${gsoptfile}" "${file}"
     if [ $? == '0' ]; then
-        optsize=$(stat -c "%s" "${optfile}")
-        orgsize=$(stat -c "%s" "${file}")
+        optsize=$(stat -c "%s" -- "${optfile}")
+        orgsize=$(stat -c "%s" -- "${file}")
         if [ "${optsize}" -eq 0 ]; then
             echo -e "╚══ No output!  Keeping original."
             rm -f "${optfile}"
+            rmdir "/tmp/${current_dir_name}/${dirpath}" > /dev/null 2>&1
             continue
         fi
+        set -o noglob   # Disable wildcard expansion
         if [ ${optsize} -ge ${orgsize} ]; then
             echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original.\e[0m"
             rm -f "${optfile}"
+            rmdir "/tmp/${current_dir_name}/${dirpath}" > /dev/null 2>&1
             continue
         fi
         bytesSaved=$(expr $orgsize - $optsize)
@@ -90,6 +114,7 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
         # rm "${file}"
         # mv "${optfile}" "${file}"
     fi
+    
 done
 
 rmdir "/tmp/${current_dir_name}" &> /dev/null
