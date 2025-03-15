@@ -111,10 +111,11 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
     if [ -n "$output" ]; then
         echo "$output"
     fi
-    if echo "$output" | grep -iq "error"; then
+    if echo "$output" | grep -Eiq "Error|Warning|can\'t"; then
         echo "❌ Ghostscript encountered an error! ❌"
         echo "${file}" >> /tmp/gs_error.log  
         echo "$output" >> /tmp/gs_error.log  # Save the error log for debugging
+        printf '%80s\n' | tr ' ' '=' >> /tmp/gs_error.log
         cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"  # Cleanup if needed
         continue
     fi
