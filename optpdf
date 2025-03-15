@@ -24,6 +24,19 @@ usage() {
     exit 1
 }
 
+cleanup() {
+    local optfile="$1"
+    local dirpath="$2"
+
+    # Remove file if it exists
+    [ -f "${optfile}" ] && rm -f "${optfile}"
+
+    # Remove directory if it exists and is empty
+    if [ -d "${dirpath}" ]; then
+        rmdir "${dirpath}" > /dev/null 2>&1
+    fi
+}
+
 # Enable case-insensitive matching for 'case'
 shopt -s nocasematch
 
@@ -97,15 +110,12 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
         orgsize=$(stat -c "%s" -- "${file}")
         if [ "${optsize}" -eq 0 ]; then
             echo -e "╚══ No output!  Keeping original."
-            rm -f "${optfile}"
-            rmdir "/tmp/${current_dir_name}/${dirpath}" > /dev/null 2>&1
+            cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"
             continue
         fi
-        set -o noglob   # Disable wildcard expansion
         if [ ${optsize} -ge ${orgsize} ]; then
             echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original.\e[0m"
-            rm -f "${optfile}"
-            rmdir "/tmp/${current_dir_name}/${dirpath}" > /dev/null 2>&1
+            cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"
             continue
         fi
         bytesSaved=$(expr $orgsize - $optsize)
