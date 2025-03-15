@@ -112,7 +112,7 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
         echo "$output"
     fi
     if echo "$output" | grep -Eiq "Error|Warning|can\'t"; then
-        echo "❌ Ghostscript encountered an error! ❌"
+        echo "❌ Ghostscript encountered an issue! ❌"
         echo "${file}" >> /tmp/gs_error.log  
         echo "$output" >> /tmp/gs_error.log  # Save the error log for debugging
         printf '%80s\n' | tr ' ' '=' >> /tmp/gs_error.log
