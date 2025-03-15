@@ -92,6 +92,8 @@ done
 
 mkdir -p "/tmp/${current_dir_name}"
 
+rm /tmp/gs_error.log  > /dev/null 2>&1
+
 # Rest of the script...
 # for i in `ls ${pdf_files[@]}`; do
 for ((i=0; i<${#pdf_files[@]}; i++)); do
@@ -103,8 +105,19 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
     mkdir -p "/tmp/${current_dir_name}/${dirpath}"
     optfile=$(realpath "/tmp/${current_dir_name}/${dirpath}/${filebase}${RNDSFX}.pdf")
     gsoptfile=$(echo "$optfile" | sed 's/%/%%/g')
-    gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
-            -sOutputFile="${gsoptfile}" "${file}"
+    
+    output=$(gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
+            -sOutputFile="${gsoptfile}" "${file}" 2>&1)  # Capture both stdout and stderr
+    if [ -n "$output" ]; then
+        echo "$output"
+    fi
+    if echo "$output" | grep -iq "error"; then
+        echo "❌ Ghostscript encountered an error! ❌"
+        echo "${file}" >> /tmp/gs_error.log  
+        echo "$output" >> /tmp/gs_error.log  # Save the error log for debugging
+        cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"  # Cleanup if needed
+        continue
+    fi
     if [ $? == '0' ]; then
         optsize=$(stat -c "%s" -- "${optfile}")
         orgsize=$(stat -c "%s" -- "${file}")
