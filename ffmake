@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SCRIPT_PATH="$(realpath "$0")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+
+if [ -f Makefile ] || [ -f makefile ] || [ -f GNUmakefile ]; then
+    exec make "$@"
+else
+    exec make -f "${SCRIPT_DIR}/obsMakefile" "$@"
+fi
+

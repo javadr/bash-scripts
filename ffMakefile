@@ -1,0 +1,13 @@
+
+
+
+CROP := 1920:988:0:92
+INPUT ?=
+
+ffplay:
+	$@ "$(INPUT)" -vf "crop=$(CROP)"
+
+crop:
+	@stem=$$(basename "$(INPUT)"); \
+	stem=$${stem%.*}; \
+	ffmpeg -i "$(INPUT)" -vf "crop=$(CROP)" -c:a copy "$${stem}-crop.mp4"
