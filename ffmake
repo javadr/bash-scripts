@@ -6,6 +6,6 @@ SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
 if [ -f Makefile ] || [ -f makefile ] || [ -f GNUmakefile ]; then
     exec make "$@"
 else
-    exec make -f "${SCRIPT_DIR}/obsMakefile" "$@"
+    exec make -f "${SCRIPT_DIR}/ffMakefile" "$@"
 fi
 
