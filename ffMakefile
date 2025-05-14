@@ -3,8 +3,8 @@
 
 CROP := 1920:988:0:92
 INPUT ?=
-FROM ?= 00:00:00
-TO ?= 00:00:00
+FROM ?= 00:00:00.0
+TO ?= 00:00:00.0
 
 ffplay:
 	$@ "$(INPUT)" -vf "crop=$(CROP)"
