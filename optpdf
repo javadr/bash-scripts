@@ -24,6 +24,19 @@ usage() {
     exit 1
 }
 
+printf_selected_files() {
+    echo "Selected File(s) ..."
+    for ((i=0; i<${#pdf_files[@]}; i++)); do
+        printf  "  %2d) %s\n" $((i+1)) "${pdf_files[i]}"
+    done
+}
+
+print_optimizing_msg() {
+    local idx="$1"
+    local fname="$2"
+    echo -e "${idx}) Optimizing \e[35m${fname}\e[0m ..."
+}
+
 cleanup() {
     local optfile="$1"
     local dirpath="$2"
@@ -43,6 +56,7 @@ shopt -s nocasematch
 # Initialize variables
 RNDSFX=""
 recursive=false
+verbose=false
 pdf_files=()
 
 # Parse command-line options
@@ -54,6 +68,10 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         -r|--recursive)  # Enable recursive search
             recursive=true
+            shift
+            ;;
+        -v|--verbose)  # Enable verbose output
+            verbose=true
             shift
             ;;
         *.pdf)  # If argument is a PDF file, add to array
@@ -85,20 +103,18 @@ fi
 
 current_dir_name=$(basename "$PWD")
 
-echo "Selected File(s) ..."
-for ((i=0; i<${#pdf_files[@]}; i++)); do
-    printf  "  %2d) %s\n" $((i+1)) "${pdf_files[i]}"
-done
+printf_selected_files
 
 mkdir -p "/tmp/${current_dir_name}"
 
 rm /tmp/gs_error.log  > /dev/null 2>&1
 
 # Rest of the script...
-# for i in `ls ${pdf_files[@]}`; do
+
+
 for ((i=0; i<${#pdf_files[@]}; i++)); do
     file="${pdf_files[i]}"
-    echo -e "$((i+1))) Optimizing \e[35m$file\e[0m ..."
+    [ "$verbose" = true ] && print_optimizing_msg $((i+1)) $file
     filebase="$(basename "$file" .pdf)"
     # Get the full directory path without the file name
     dirpath=$(dirname "$file")
@@ -123,17 +139,19 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
         optsize=$(stat -c "%s" -- "${optfile}")
         orgsize=$(stat -c "%s" -- "${file}")
         if [ "${optsize}" -eq 0 ]; then
-            echo -e "╚══ No output!  Keeping original."
+            [ "$verbose" = true ] && echo -e "╚══ No output!  Keeping original."
             cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"
             continue
         fi
         if [ ${optsize} -ge ${orgsize} ]; then
-            echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original.\e[0m"
+            [ "$verbose" = true ] && echo -e "╚══ \e[;30;47mDidn't make it smaller! Keeping original.\e[0m"
             cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"
             continue
         fi
         bytesSaved=$(expr $orgsize - $optsize)
         percent=$(expr $optsize '*' 100 / $orgsize)
+        # Only print Optimizing... message here if NOT in verbose mode
+        [ "$verbose" = false ] && print_optimizing_msg $((i+1)) $file
         echo -e "╚══ Saving \e[32m$bytesSaved\e[0m bytes (\e[31m${percent}%\e[0m of the original one!)"
         # rm "${file}"
         # mv "${optfile}" "${file}"
