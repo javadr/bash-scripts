@@ -31,12 +31,6 @@ printf_selected_files() {
     done
 }
 
-print_optimizing_msg() {
-    local idx="$1"
-    local fname="$2"
-    echo -e "${idx}) Optimizing \e[35m${fname}\e[0m ..."
-}
-
 cleanup() {
     local optfile="$1"
     local dirpath="$2"
@@ -114,25 +108,25 @@ rm /tmp/gs_error.log  > /dev/null 2>&1
 
 for ((i=0; i<${#pdf_files[@]}; i++)); do
     file="${pdf_files[i]}"
-    [ "$verbose" = true ] && print_optimizing_msg $((i+1)) $file
+    if [ "$verbose" = true ]; then
+        printf "%s) Optimizing \e[35m%s\e[0m ...\n" $((i+1)) "$file"
+    else
+        printf "\r%s) Optimizing \e[35m%s\e[0m ...\033[K" $((i+1)) "$file"
+    fi
     filebase="$(basename "$file" .pdf)"
-    # Get the full directory path without the file name
     dirpath=$(dirname "$file")
     mkdir -p "/tmp/${current_dir_name}/${dirpath}"
     optfile=$(realpath "/tmp/${current_dir_name}/${dirpath}/${filebase}${RNDSFX}.pdf")
     gsoptfile=$(echo "$optfile" | sed 's/%/%%/g')
-    
     output=$(gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
-            -sOutputFile="${gsoptfile}" "${file}" 2>&1)  # Capture both stdout and stderr
-    if [ -n "$output" ]; then
-        echo "$output"
-    fi
-    if echo "$output" | grep -Eiq "Error|Warning|can\'t"; then
+            -sOutputFile="${gsoptfile}" "${file}" 2>&1)
+    [ -n "$output" ] && echo "$output"
+    if echo "$output" | grep -Eiq "Error|Warning|can\\'t"; then
         echo "❌ Ghostscript encountered an issue! ❌"
         echo "${file}" >> /tmp/gs_error.log  
-        echo "$output" >> /tmp/gs_error.log  # Save the error log for debugging
+        echo "$output" >> /tmp/gs_error.log
         printf '%80s\n' | tr ' ' '=' >> /tmp/gs_error.log
-        cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"  # Cleanup if needed
+        cleanup "${optfile}" "/tmp/${current_dir_name}/${dirpath}"
         continue
     fi
     if [ $? == '0' ]; then
@@ -150,13 +144,14 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
         fi
         bytesSaved=$(expr $orgsize - $optsize)
         percent=$(expr $optsize '*' 100 / $orgsize)
-        # Only print Optimizing... message here if NOT in verbose mode
-        [ "$verbose" = false ] && print_optimizing_msg $((i+1)) $file
+        [ "$verbose" = false ] && printf "\n"
         echo -e "╚══ Saving \e[32m$bytesSaved\e[0m bytes (\e[31m${percent}%\e[0m of the original one!)"
         # rm "${file}"
         # mv "${optfile}" "${file}"
     fi
-    
+
 done
+
+[ "$verbose" = false ] && printf "\r"
 
 rmdir "/tmp/${current_dir_name}" &> /dev/null
