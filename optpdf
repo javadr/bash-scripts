@@ -118,8 +118,13 @@ for ((i=0; i<${#pdf_files[@]}; i++)); do
     mkdir -p "/tmp/${current_dir_name}/${dirpath}"
     optfile=$(realpath "/tmp/${current_dir_name}/${dirpath}/${filebase}${RNDSFX}.pdf")
     gsoptfile=$(echo "$optfile" | sed 's/%/%%/g')
-    output=$(gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH \
-            -sOutputFile="${gsoptfile}" "${file}" 2>&1)
+    output=$(gs -sDEVICE=pdfwrite \
+                -dCompatibilityLevel=1.4 \
+                -dAutoRotatePages=/None \
+                -dUseCropBox \
+                -dPreserveEPSInfo=true \
+                -dNOPAUSE -dQUIET -dBATCH \
+                -sOutputFile="${gsoptfile}" "${file}" 2>&1)
     [ -n "$output" ] && echo "$output"
     if echo "$output" | grep -Eiq "Error|Warning|can\\'t"; then
         echo "❌ Ghostscript encountered an issue! ❌"
