@@ -69,7 +69,15 @@ while [[ "$#" -gt 0 ]]; do
             shift
             ;;
         *.pdf)  # If argument is a PDF file, add to array
-            pdf_files+=("$1")
+            # CHECK if it is actually a file before adding
+            if [ -f "$1" ]; then
+                pdf_files+=("$1")
+            elif [ -d "$1" ] && [ "$recursive" = true ]; then
+                # If it's a directory named .pdf and recursive is on, search inside it
+                while IFS= read -r -d '' file; do
+                    pdf_files+=("$file")
+                done < <(find "$1" -type f -iname "*.pdf" -print0)
+            fi
             shift
             ;;
         -*)  # Unknown option
@@ -78,7 +86,10 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         *)  # Assume it's a directory if recursive is enabled
             if [ "$recursive" = true ] && [ -d "$1" ]; then
-                pdf_files+=($(find "$1" -type f -iname "*.pdf"))
+                # Safe way to handle files with spaces
+                while IFS= read -r -d '' file; do
+                    pdf_files+=("$file")
+                done < <(find "$1" -type f -iname "*.pdf" -print0)
             else
                 echo "Skipping unrecognized input: $1"
             fi
