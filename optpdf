@@ -171,3 +171,5 @@ done
 [ "$verbose" = false ] && printf "\r"
 
 rmdir "/tmp/${current_dir_name}" &> /dev/null
+
+exit 0
