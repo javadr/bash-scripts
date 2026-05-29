@@ -8,5 +8,5 @@ source ~/.bashrc;
 echo 'cleansing auxilaries files';
 mclean ;
 echo 'Done!';
-sleep 1;
+sleep .3;
 exit" &

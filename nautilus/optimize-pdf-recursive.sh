@@ -7,5 +7,5 @@ gnome-terminal -- bash -c "
 source ~/.bashrc;
 echo 'Processing files...';
 optpdf -r .;
-echo 'Done!';
+printf 'Done!';
 exec bash" # keep the shell open
