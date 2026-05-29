@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+## Defaults
+signature=4
+signatureKey="signature*"
+nup="2x1"
+extraPdfpagesOptions=()
+inputFile=""
+
+## Output directory is where the script is called
+outDir="$(pwd)"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  make_booklet.sh [OPTIONS] [input.pdf]
+
+Options:
+  -p, --pdfpages OPTION      Extra pdfpages option for \includepdf.
+                             Can be used multiple times.
+
+  -h, --help                 Show help.
+
+Examples:
+  ./make_booklet.sh
+  ./make_booklet.sh file.pdf
+  ./make_booklet.sh -p "signature=8" file.pdf
+  ./make_booklet.sh -p "signature*=8" file.pdf
+  ./make_booklet.sh -p "nup=2x2" -p "signature=8" file.pdf
+  ./make_booklet.sh -p "scale=0.99" -p "delta=0 12mm" file.pdf
+  ./make_booklet.sh -p "trim=5mm 5mm 5mm 5mm,clip" file.pdf
+EOF
+}
+
+handlePdfpagesOption() {
+  local option="$1"
+
+  if [[ "$option" =~ ^[[:space:]]*(signature[*]?)=([0-9]+)[[:space:]]*$ ]]; then
+    signatureKey="${BASH_REMATCH[1]}"
+    signature="${BASH_REMATCH[2]}"
+    return
+  fi
+
+  if [[ "$option" =~ ^[[:space:]]*signature[*]?= ]]; then
+    echo "Error: signature must be a positive integer." >&2
+    exit 1
+  fi
+
+  if [[ "$option" =~ ^[[:space:]]*nup=([^[:space:]]+)[[:space:]]*$ ]]; then
+    nup="${BASH_REMATCH[1]}"
+    return
+  fi
+
+  extraPdfpagesOptions+=("$option")
+}
+
+## Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -p|--pdfpages)
+      handlePdfpagesOption "${2:?Error: --pdfpages requires a value}"
+      shift 2
+      ;;
+
+    -h|--help)
+      usage
+      exit 0
+      ;;
+
+    -*)
+      echo "Error: unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+
+    *)
+      if [[ -n "$inputFile" ]]; then
+        echo "Error: only one input PDF path is supported." >&2
+        exit 1
+      fi
+
+      inputFile="$1"
+      shift
+      ;;
+  esac
+done
+
+## Validate signature
+if ! [[ "$signature" =~ ^[0-9]+$ ]] || [[ "$signature" -lt 4 ]]; then
+  echo "Error: signature must be a positive integer and at least 4." >&2
+  exit 1
+fi
+
+if (( signature % 4 != 0 )); then
+  echo "Error: signature must be a multiple of 4." >&2
+  exit 1
+fi
+
+suffix="$((signature / 2))x1"
+
+## Check dependencies
+command -v pdflatex >/dev/null 2>&1 || {
+  echo "Error: pdflatex is not installed or not in PATH." >&2
+  exit 1
+}
+
+## Select input PDFs
+if [[ -z "$inputFile" ]]; then
+  shopt -s nullglob
+  pdfFiles=(./*.pdf)
+  shopt -u nullglob
+
+  if [[ ${#pdfFiles[@]} -eq 0 ]]; then
+    echo "Error: no PDF files found in current directory." >&2
+    exit 1
+  fi
+else
+  if [[ ! -f "$inputFile" ]]; then
+    echo "Error: file not found: $inputFile" >&2
+    exit 1
+  fi
+
+  if [[ "${inputFile,,}" != *.pdf ]]; then
+    echo "Error: input file must be a PDF: $inputFile" >&2
+    exit 1
+  fi
+
+  pdfFiles=("$inputFile")
+fi
+
+## Temporary root
+tmpRoot="$(mktemp -d)"
+trap 'rm -rf "$tmpRoot"' EXIT
+
+writePdfpagesOptions() {
+  local options=(
+    "pages=-"
+    "nup=${nup}"
+    "${signatureKey}=${signature}"
+    "landscape"
+  )
+
+  options+=("${extraPdfpagesOptions[@]}")
+
+  local lastIndex=$(( ${#options[@]} - 1 ))
+
+  for i in "${!options[@]}"; do
+    if [[ "$i" -eq "$lastIndex" ]]; then
+      printf '  %s\n' "${options[$i]}"
+    else
+      printf '  %s,\n' "${options[$i]}"
+    fi
+  done
+}
+
+makeBooklet() {
+  local pdfPath="$1"
+
+  local fileName
+  fileName="$(basename "$pdfPath")"
+
+  local inputBase="${fileName%.[Pp][Dd][Ff]}"
+  local outputName="${inputBase}_${suffix}.pdf"
+  local outputFile="${outDir}/${outputName}"
+
+  local jobDir
+  jobDir="$(mktemp -d "${tmpRoot}/booklet.XXXXXX")"
+
+  ## Keep all build files inside tmp
+  cp "$pdfPath" "${jobDir}/input.pdf"
+
+  ## Create LaTeX file inside tmp
+  {
+    cat <<EOF
+\\documentclass{article}
+\\usepackage[margin=0pt,a4paper]{geometry}
+\\usepackage{pdfpages}
+\\begin{document}
+\\includepdf[
+EOF
+
+    writePdfpagesOptions
+
+    cat <<EOF
+]{input.pdf}
+\\end{document}
+EOF
+  } > "${jobDir}/booklet.tex"
+
+  ## Run pdflatex inside tmp
+  (
+    cd "$jobDir"
+
+    pdflatex \
+      -interaction=nonstopmode \
+      -halt-on-error \
+      booklet.tex >/dev/null
+  )
+
+  ## Move final output only
+  mv -f "${jobDir}/booklet.pdf" "$outputFile"
+
+  echo "Created: $outputName"
+}
+
+for pdf in "${pdfFiles[@]}"; do
+  makeBooklet "$pdf"
+done
